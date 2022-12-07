@@ -1,0 +1,15 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "removeComments": true,
+    "noImplicitAny" : false,
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "dist/scripts",
+    "watch": false
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

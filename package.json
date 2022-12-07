@@ -1,0 +1,25 @@
+{
+  "name": "top-gear-study",
+  "version": "1.0.0",
+  "description": "A study about the game Top Gear",
+  "scripts": {
+    "dev": "yarn grunt",
+    "server": "nodemon localhost 8080",
+    "fast-push": "git add . && git commit -m 'fast-push' && git push"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~1.5.3",
+    "grunt-contrib-connect": "^3.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jshint": "~3.2.0",
+    "grunt-contrib-nodeunit": "~4.0.0",
+    "grunt-contrib-uglify": "~5.2.2",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-ts": "^6.0.0-beta.22",
+    "typescript": "^4.9.3"
+  }
+}
