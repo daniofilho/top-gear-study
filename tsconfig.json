@@ -3,11 +3,12 @@
   "compilerOptions": {
     "removeComments": true,
     "noImplicitAny" : false,
-    "module": "commonjs",
+    "module": "amd",
     "target": "es6",
     "sourceMap": true,
     "outDir": "dist/scripts",
-    "watch": false
+    "watch": false,
+    "moduleResolution": "node"
   },
   "exclude": [
     "node_modules"

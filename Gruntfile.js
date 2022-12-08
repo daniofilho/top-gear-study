@@ -41,6 +41,13 @@ module.exports = function (grunt) {
           },
           {
             expand: true,
+            cwd: 'src/libs',
+            src: '**',
+            dest: 'dist/assets',
+            filter: 'isFile',
+          },
+          {
+            expand: true,
             cwd: 'src',
             src: 'index.html',
             dest: 'dist',
