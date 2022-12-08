@@ -1,3 +1,10 @@
-import test from './test';
+import Game from './engine/core/game/index';
 
-console.log(test);
+window.onload = function () {
+  const runGame = () => {
+    let game = Game();
+    game.run();
+  };
+
+  runGame();
+};

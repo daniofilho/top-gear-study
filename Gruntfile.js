@@ -60,7 +60,7 @@ module.exports = function (grunt) {
       scripts: {
         options: { livereload: true },
         files: ['src/**/*'],
-        tasks: ['ts:dev'],
+        tasks: ['ts'],
       },
     },
     connect: {
