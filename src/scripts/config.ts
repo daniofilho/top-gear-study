@@ -1,5 +1,5 @@
 const config = {
-  fps: 5,
+  fps: 2,
   canvas: {
     width: 400,
     height: 400,

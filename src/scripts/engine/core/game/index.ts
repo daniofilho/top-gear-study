@@ -7,7 +7,6 @@ const Game = (): IGame => {
   let fpsInterval: number = 0;
   let now: number = 0;
   let deltaTime: number = 0;
-  let startTime: number = 0;
   let elapsed: number = 0;
 
   // Canvas
@@ -17,6 +16,8 @@ const Game = (): IGame => {
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   const clearScreen = () => {
+    if (!context) return;
+
     context.clearRect(0, 0, config.canvas.width, config.canvas.height);
 
     context.beginPath();
@@ -26,7 +27,10 @@ const Game = (): IGame => {
   };
 
   // # The Game Loop
-  const updateGame = (deltaTime: number) => {
+  const updateGame = () => {
+    // deltaTime: number
+    if (!context) return;
+
     clearScreen();
 
     // The fun....
@@ -40,10 +44,10 @@ const Game = (): IGame => {
       2 * Math.PI,
       false
     );
-    context.fillStyle = 'yellow';
+    context.fillStyle = '#984300';
     context.fill();
-    context.lineWidth = 1;
-    context.strokeStyle = '#003300';
+    context.lineWidth = 10;
+    context.strokeStyle = '#984300';
     context.stroke();
   };
 
@@ -58,7 +62,7 @@ const Game = (): IGame => {
       // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
       deltaTime = now - (elapsed % fpsInterval);
 
-      updateGame(deltaTime);
+      updateGame(); // deltaTime
     }
 
     // Runs only when the browser is in focus
@@ -70,7 +74,6 @@ const Game = (): IGame => {
   const runGame = (fps: number) => {
     fpsInterval = 1000 / fps;
     deltaTime = Date.now();
-    startTime = deltaTime;
     gameLoop();
   };
 

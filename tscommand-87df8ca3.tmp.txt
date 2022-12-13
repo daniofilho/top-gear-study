@@ -1,1 +1,0 @@
-src/scripts/config.ts src/scripts/engine/core/game/index.ts src/scripts/engine/core/game/types.d.ts src/scripts/main.ts --sourcemap --removeComments --moduleResolution node --target ES6 --module amd --outDir dist/scripts

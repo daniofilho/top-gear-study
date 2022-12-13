@@ -1,16 +1,19 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "removeComments": true,
-    "noImplicitAny" : false,
-    "module": "amd",
-    "target": "es6",
-    "sourceMap": true,
-    "outDir": "dist/scripts",
-    "watch": false,
-    "moduleResolution": "node"
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "Node",
+    "strict": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src"]
 }
