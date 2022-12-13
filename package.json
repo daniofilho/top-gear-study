@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "fast-push": "git add . && git commit -m '.' && git push"
   },
   "keywords": [],
   "author": "",

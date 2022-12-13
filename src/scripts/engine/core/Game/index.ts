@@ -1,8 +1,10 @@
 import config from '../../../config';
+import RenderLevel from '../../renders/level/RenderLevel';
+import { IRenderLevel } from '../../renders/level/types';
 
 import { IGame } from './types';
 
-const Game = (): IGame => {
+const Game = (): IGame | null => {
   // FPS Control
   let fpsInterval: number = 0;
   let now: number = 0;
@@ -10,45 +12,37 @@ const Game = (): IGame => {
   let elapsed: number = 0;
 
   // Canvas
-  let canvas: HTMLCanvasElement | null = null;
-  let context: CanvasRenderingContext2D | null = null;
+
+  const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+  const context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+  canvas.width = config.canvas.width;
+  canvas.height = config.canvas.height;
+
+  // Renders
+  let renderLevel: IRenderLevel = RenderLevel({ context });
 
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   const clearScreen = () => {
     if (!context) return;
 
-    context.clearRect(0, 0, config.canvas.width, config.canvas.height);
-
     context.beginPath();
     context.rect(0, 0, config.canvas.width, config.canvas.height);
     context.fillStyle = 'black';
     context.fill();
+    context.shadowBlur = 0;
   };
 
   // # The Game Loop
-  const updateGame = () => {
-    // deltaTime: number
+  const updateGame = (deltaTime: number) => {
+    //
     if (!context) return;
 
     clearScreen();
 
-    // The fun....
-
-    context.beginPath();
-    context.arc(
-      Math.floor(Math.random() * config.canvas.width - 30) + 0,
-      Math.floor(Math.random() * config.canvas.height - 30) + 0,
-      30,
-      0,
-      2 * Math.PI,
-      false
-    );
-    context.fillStyle = '#984300';
-    context.fill();
-    context.lineWidth = 10;
-    context.strokeStyle = '#984300';
-    context.stroke();
+    // Renders
+    renderLevel.render({ deltaTime });
   };
 
   const gameLoop = () => {
@@ -62,7 +56,7 @@ const Game = (): IGame => {
       // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
       deltaTime = now - (elapsed % fpsInterval);
 
-      updateGame(); // deltaTime
+      updateGame(deltaTime);
     }
 
     // Runs only when the browser is in focus
@@ -80,13 +74,6 @@ const Game = (): IGame => {
   // # Start/Restart a Game
 
   const startNewGame = () => {
-    canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    context = canvas.getContext('2d');
-
-    canvas.width = config.canvas.width;
-    canvas.height = config.canvas.height;
-
-    // Ok, run the game now
     runGame(config.fps); // GO GO GO
   };
 

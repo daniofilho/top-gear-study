@@ -1,4 +1,4 @@
-import Game from './engine/core/game/index';
+import Game from './engine/core/Game/index';
 
 window.onload = function () {
   const runGame = () => {

@@ -4,6 +4,9 @@ const config = {
     width: 400,
     height: 400,
   },
+  track: {
+    resolution: 50, // x lines
+  },
 };
 
 export default config;
