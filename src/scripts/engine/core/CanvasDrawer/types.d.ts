@@ -14,10 +14,14 @@ interface IDefaultVisualParams {
 
 // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-interface IDrawRectangleProps
+interface IRectangleProps
   extends IDefaultCoordinatesParams,
     IDefaultSizesParams,
     IDefaultVisualParams {}
+interface ITextProps extends IDefaultCoordinatesParams, IDefaultVisualParams {
+  text: string;
+  fontSize: string;
+}
 
 // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -26,5 +30,6 @@ export interface ICanvasDrawerProps {
 }
 
 export interface ICanvasDrawer {
-  drawRectangle: (params: IDrawRectangleProps) => void;
+  rectangle: (params: IRectangleProps) => void;
+  text: (params: ITextProps) => void;
 }

@@ -2,7 +2,7 @@ import Game from './engine/core/Game/index';
 
 window.onload = function () {
   const runGame = () => {
-    let game = Game();
+    let game = new Game();
     game.run();
   };
 

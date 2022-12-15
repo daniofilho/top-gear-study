@@ -1,92 +1,138 @@
 import config from '../../../config';
-import RenderLevel from '../../renders/level/RenderLevel';
-import { IRenderLevel } from '../../renders/level/types';
+import Level from '../../objects/level';
+import Car from '../../objects/car';
+import UI from '../../objects/ui';
 
-import { IGame } from './types';
-
-const Game = (): IGame | null => {
+class Game {
   // FPS Control
-  let fpsInterval: number = 0;
-  let now: number = 0;
-  let deltaTime: number = 0;
-  let elapsed: number = 0;
+  fpsInterval: number = 0;
+  now: number = 0;
+  deltaTime: number = 0;
+  elapsed: number = 0;
 
   // Canvas
 
-  const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
-  const context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+  canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+  context: CanvasRenderingContext2D = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 
-  canvas.width = config.canvas.width;
-  canvas.height = config.canvas.height;
+  car?: Car;
+  level?: Level;
+  ui?: UI;
 
-  // Renders
-  let renderLevel: IRenderLevel = RenderLevel({ context });
+  keysDown: any = {}; // TODO correct type this
+
+  constructor() {
+    // turn off image aliasing
+    this.context.imageSmoothingEnabled = false;
+
+    this.canvas.width = config.canvas.width;
+    this.canvas.height = config.canvas.height;
+
+    // Objects
+    this.car = new Car({ context: this.context });
+    this.level = new Level({ context: this.context, car: this.car });
+    this.ui = new UI({ context: this.context, car: this.car });
+  }
 
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  const clearScreen = () => {
-    if (!context) return;
+  startEventListeners = (): void => {
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        this.keysDown[e.key] = true;
+      },
+      false
+    );
 
-    context.beginPath();
-    context.rect(0, 0, config.canvas.width, config.canvas.height);
-    context.fillStyle = 'black';
-    context.fill();
-    context.shadowBlur = 0;
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        this.keysDown[e.key] = false;
+      },
+      false
+    );
+  };
+
+  handleKeyPress = (): void => {
+    if (!this.car) return;
+
+    if (this.keysDown['ArrowLeft']) this.car.turnLeft();
+    if (this.keysDown['ArrowRight']) this.car.turnRight();
+
+    if (this.keysDown['ArrowUp']) {
+      this.car.accelerate();
+    } else {
+      this.car.slowDown();
+    }
+
+    if (this.keysDown['ArrowDown']) this.car.stop();
+  };
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  clearScreen = () => {
+    this.context.beginPath();
+    this.context.rect(0, 0, config.canvas.width, config.canvas.height);
+    this.context.fillStyle = 'black';
+    this.context.fill();
+    this.context.shadowBlur = 0;
   };
 
   // # The Game Loop
-  const updateGame = (deltaTime: number) => {
-    //
-    if (!context) return;
+  updateGame = (deltaTime: number) => {
+    if (!this.context || !this.level || !this.car || !this.ui) return;
 
-    clearScreen();
+    this.clearScreen();
 
-    // Renders
-    renderLevel.render({ deltaTime });
+    // Render Objects
+    this.level.render({ deltaTime });
+    this.car.render({ deltaTime });
+    this.ui.render({ deltaTime });
+
+    // Keypress
+    this.handleKeyPress();
   };
 
-  const gameLoop = () => {
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  gameLoop = (): void => {
     // calc elapsed time since last loop
-    now = Date.now();
-    elapsed = now - deltaTime;
+    this.now = Date.now();
+    this.elapsed = this.now - this.deltaTime;
 
     // if enough time has elapsed, draw the next frame
-    if (elapsed > fpsInterval) {
+    if (this.elapsed > this.fpsInterval) {
       // Get ready for next frame by setting then=now, but also adjust for your
       // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
-      deltaTime = now - (elapsed % fpsInterval);
+      this.deltaTime = this.now - (this.elapsed % this.fpsInterval);
 
-      updateGame(deltaTime);
+      this.updateGame(this.deltaTime);
     }
 
     // Runs only when the browser is in focus
     // Request another frame
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(this.gameLoop);
   };
 
   // # "Thread" tha runs the game
-  const runGame = (fps: number) => {
-    fpsInterval = 1000 / fps;
-    deltaTime = Date.now();
-    gameLoop();
+  runGame = (fps: number) => {
+    this.fpsInterval = 1000 / fps;
+    this.deltaTime = Date.now();
+    this.gameLoop();
   };
 
   // # Start/Restart a Game
 
-  const startNewGame = () => {
-    runGame(config.fps); // GO GO GO
+  startNewGame = () => {
+    this.runGame(config.fps); // GO GO GO
   };
 
   // # Run
-  const run = () => {
-    startNewGame();
+  run = (): void => {
+    this.startEventListeners();
+    this.startNewGame();
   };
-
-  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  return {
-    run,
-  };
-};
+}
 
 export default Game;

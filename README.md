@@ -1,4 +1,4 @@
-# top-gear-study
+# A Study about the game Top Gear
 
 ## Usage
 
@@ -9,3 +9,9 @@
 `yarn preview` => Preview production build on a local server running on http://localhost:4173/;
 
 `yarn build` => Create production build on `/dist` folder;
+
+# References
+
+Code-It-Yourself! Retro Arcade Racing Game - Programming from Scratch (Quick and Simple C++)
+javidx9
+[https://www.youtube.com/watch?v=KkMZI5Jbf18]

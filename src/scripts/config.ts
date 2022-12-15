@@ -1,11 +1,8 @@
 const config = {
-  fps: 2,
+  fps: 24,
   canvas: {
-    width: 400,
-    height: 400,
-  },
-  track: {
-    resolution: 50, // x lines
+    width: 300,
+    height: 200,
   },
 };
 

@@ -1,13 +1,13 @@
-declare interface IRenderProps {
+declare interface IObjectProps {
   context: CanvasRenderingContext2D;
 }
 
 // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-declare interface IRenderFunctionProps {
+declare interface IRenderObjectProps {
   deltaTime: number;
 }
 
-declare interface IRender {
-  render: (data: IRenderFunctionProps) => void;
+declare interface IObject {
+  render: (data: IRenderObjectProps) => void;
 }
