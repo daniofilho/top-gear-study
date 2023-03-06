@@ -1,82 +1,162 @@
 import config from '../../../config';
 import CanvasDrawer from '../../core/CanvasDrawer';
 import { ICanvasDrawer } from '../../core/CanvasDrawer/types';
+import { ICarProps, ICarRenderProps } from './types';
 
 class Car {
-  drawer: ICanvasDrawer | null;
+  #drawer: ICanvasDrawer | null;
 
-  width: number = config.canvas.width * 0.25;
-  height: number = config.canvas.height * 0.1;
-  color = '#FF0';
-  y: number = config.canvas.height - config.canvas.height * 0.15;
-  sideVelocity: number = 0.05;
-  acceleration: number = 0.3;
+  #width: number = config.canvas.width * 0.25;
+  #height: number = config.canvas.height * 0.1;
+  #color = '#FF0';
+  #y: number = config.canvas.height - config.canvas.height * 0.15;
+  #sideVelocity: number = 0.5;
+  #acceleration: number = 2;
 
-  position: number = 0; // -1 to 1, 0 is center of screen
-  distanceTraveled: number = 0;
-  speed: number = 0;
-  maxSpeed: number = 200;
+  #position: number = 0; // -1 to 1, 0 is center of screen
+  #curvature: number = 0;
+  #distanceTraveled: number = 0;
+  #positionOnTrack: number = 0;
+  #speed: number = 0;
+  #maxSpeed: number = 100;
 
-  centerX: number = config.canvas.width / 2;
-  screenWidthWithBounds: number = config.canvas.width - this.width;
+  #centerX: number = config.canvas.width / 2;
+  #screenWidthWithBounds: number = config.canvas.width - this.#width;
+
+  #isOutOfTrack: boolean = false;
 
   constructor({ context }: ICarProps) {
-    this.drawer = CanvasDrawer({ context });
+    this.#drawer = CanvasDrawer({ context });
   }
 
-  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  get speed() {
+    return this.#speed;
+  }
+
+  set speed(targetSpeed: number) {
+    this.#speed = targetSpeed;
+  }
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  get position() {
+    return this.#position;
+  }
+
+  set position(targetPosition: number) {
+    this.#position = targetPosition;
+  }
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  get positionOnTrack() {
+    return this.#positionOnTrack;
+  }
+
+  set positionOnTrack(newPosition: number) {
+    this.#positionOnTrack = newPosition;
+  }
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  get distanceTraveled() {
+    return this.#distanceTraveled;
+  }
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  get isOutOfTrack() {
+    return this.#isOutOfTrack;
+  }
+
+  set isOutOfTrack(newBool: boolean) {
+    this.#isOutOfTrack = newBool;
+  }
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   turnLeft = (): void => {
-    let newPosition = this.position - this.sideVelocity;
-    if (newPosition < -1) newPosition = -1;
+    if (this.#speed <= 0) return;
 
-    this.position = newPosition;
+    let newCurvature = this.#curvature - (this.#sideVelocity * this.#speed) / 1000;
+    if (newCurvature < -1) newCurvature = -1;
+
+    this.#curvature = newCurvature;
   };
 
   turnRight = (): void => {
-    let newPosition = this.position + this.sideVelocity;
-    if (newPosition > 1) newPosition = 1;
+    if (this.#speed <= 0) return;
 
-    this.position = newPosition;
+    let newCurvature = this.#curvature + (this.#sideVelocity * this.#speed) / 1000;
+    if (newCurvature > 1) newCurvature = 1;
+
+    this.#curvature = newCurvature;
   };
 
-  accelerate = (): void => {
-    let newSpeed = this.speed + this.acceleration * 5;
+  accelerate = (deltaTime: number): void => {
+    // limit max speed if is out of track
+    let maxSpeed = this.#maxSpeed;
 
-    if (newSpeed >= this.maxSpeed) newSpeed = this.maxSpeed;
+    if (this.#isOutOfTrack) maxSpeed = this.#maxSpeed / 3;
+
+    // stop accelerating if is out of track until reach limit speed
+    if (this.#isOutOfTrack && this.#speed > maxSpeed) return this.slowDown(deltaTime);
+
+    // limit acceleration if os out of track
+    let acceleration = this.#acceleration;
+    if (this.#isOutOfTrack) acceleration = acceleration / 10;
+
+    let newSpeed = this.#speed + this.#acceleration * deltaTime;
+    if (newSpeed >= this.#maxSpeed) newSpeed = this.#maxSpeed;
 
     this.speed = newSpeed;
-    this.distanceTraveled += newSpeed / 10;
   };
 
-  slowDown = (): void => {
-    let newSpeed = this.speed - this.acceleration;
+  slowDown = (deltaTime: number): void => {
+    let newSpeed = 0;
+    const reverseSpeed = this.#acceleration * 2;
+
+    newSpeed = this.#speed - reverseSpeed * deltaTime;
+
     if (newSpeed <= 0) newSpeed = 0;
 
     this.speed = newSpeed;
   };
 
-  stop = (): void => {
-    let newSpeed = this.speed - this.acceleration * 10;
+  break = (deltaTime: number): void => {
+    let newSpeed = this.#speed - this.#acceleration * 5 * deltaTime;
     if (newSpeed <= 0) newSpeed = 0;
 
     this.speed = newSpeed;
   };
 
-  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  render = ({ deltaTime }: IRenderObjectProps): void => {
-    if (!this.drawer) return;
+  render = ({ deltaTime, levelCurvature }: ICarRenderProps): void => {
+    if (!this.#drawer) return;
 
-    let carX = this.centerX + (this.screenWidthWithBounds * this.position) / 2 - this.width / 2;
+    this.#position = this.#curvature - levelCurvature * 3; // increase number to increase difficulty to control the car
 
-    this.drawer.rectangle({
-      color: this.color,
-      height: this.height,
-      width: this.width,
-      y: this.y,
+    //if (carPosition < -1) carPosition = -1;
+    //if (carPosition > 1) carPosition = 1;
+
+    let carX = this.#centerX + (this.#screenWidthWithBounds * this.#position) / 2 - this.#width / 2;
+
+    this.#drawer.rectangle({
+      color: this.#isOutOfTrack ? '#FF0000' : this.#color,
+      height: this.#height,
+      width: this.#width,
+      y: this.#y,
       x: carX,
     });
+
+    // Update distance traveled based on speed
+    const newTraveled = (this.#speed / 30) * deltaTime;
+
+    if (this.#speed > 0) this.#distanceTraveled += newTraveled;
+    this.#positionOnTrack += newTraveled;
   };
 }
 

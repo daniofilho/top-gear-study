@@ -15,3 +15,6 @@
 Code-It-Yourself! Retro Arcade Racing Game - Programming from Scratch (Quick and Simple C++)
 javidx9
 [https://www.youtube.com/watch?v=KkMZI5Jbf18]
+
+A Detailed Explanation of JavaScript Game Loops and Timing
+[https://isaacsukin.com/news/2015/01/detailed-explanation-javascript-game-loops-and-timing]
