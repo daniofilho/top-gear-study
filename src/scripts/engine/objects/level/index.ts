@@ -11,11 +11,22 @@ class Level {
 
   #sky = {
     height: config.canvas.height * 0.5,
-    color: '#3983d1', // TODO parâmetro
+    color: '#000044',
+  };
+
+  #mountain = {
+    color: '#9F6609',
+    size: {
+      min: this.#sky.height * 0.1,
+      max: this.#sky.height * 0.9,
+    },
   };
 
   #lines = new Array(config.canvas.height / 2).fill('');
   #lineHeight = (config.canvas.height - this.#sky.height) / this.#lines.length;
+
+  #columns = new Array(config.canvas.width).fill('');
+  #columnsWidth = config.canvas.width / this.#columns.length;
 
   #roadProps = {
     color: '#555555',
@@ -39,7 +50,6 @@ class Level {
   //offset: number = 0; // how much the car has moved
   #trackSection: number = 0; // in which section of the track is the car
   #lap: number = 1;
-  #trackLength: number = 0;
 
   #curvature: number = 0;
   #curvatureLimit: number = 0.4;
@@ -48,8 +58,6 @@ class Level {
     this.#drawer = CanvasDrawer({ context });
     this.#car = car;
     this.#track = track;
-
-    this.#trackLength = this.#track.coordinates[this.#track.coordinates.length - 1].distance;
   }
 
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,38 +77,19 @@ class Level {
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   // find position on track
-  #updateTrackSection = (carSpeed: number, carPositionOnTrack: number): void => {
+  #updateTrackSection = (carPositionOnTrack: number): void => {
     if (!this.#track || !this.#car) return;
 
-    // going forward
-    if (carSpeed >= 0) {
-      if (carPositionOnTrack <= this.#track.coordinates[this.#trackSection].distance) return;
+    if (carPositionOnTrack <= this.#track.coordinates[this.#trackSection].distance) return;
 
-      let newTrackSection = this.#trackSection + 1;
-      if (newTrackSection > this.#track.coordinates.length - 1) {
-        newTrackSection = 0;
-        this.#lap++; // ! There is a glitch here, the user can reverse and add a lap every time he cross point 0
-        this.#car.positionOnTrack = 0;
-      }
-
-      this.#trackSection = newTrackSection;
-    } else {
-      // going backwards
-      let previousSection = this.#trackSection - 1;
-      if (previousSection < 0) previousSection = this.#track.coordinates.length - 1;
-
-      if (carPositionOnTrack > this.#track.coordinates[previousSection].distance) return;
-
-      let newTrackSection = this.#trackSection - 1;
-      if (newTrackSection < 0) {
-        newTrackSection = this.#track.coordinates.length - 1;
-        console.log(newTrackSection);
-
-        this.#car.positionOnTrack = 0;
-      }
-
-      this.#trackSection = newTrackSection;
+    let newTrackSection = this.#trackSection + 1;
+    if (newTrackSection > this.#track.coordinates.length - 1) {
+      newTrackSection = 0;
+      this.#lap++;
+      this.#car.positionOnTrack = 0;
     }
+
+    this.#trackSection = newTrackSection;
   };
 
   #checkIfCarIsOutOfTrack = (carPosition: number, trackCurvature: number) => {
@@ -112,6 +101,77 @@ class Level {
     this.#car.isOutOfTrack = isCardOutOfTrack;
   };
 
+  #getMiddleSkyPointAsPositiveValue = (trackCurvature: number): number => {
+    // -1 = min curvature
+    // 1 = max curvature
+    // but output will be 0 - 0.5 for < 0 curvature and 0.5 - 1 for > 0;
+
+    let target = 0;
+
+    let min = -1;
+    let max = 1;
+
+    const range = max - min;
+    const correctedStartValue = trackCurvature - min;
+    target = (correctedStartValue * 100) / range / 100;
+
+    return target;
+  };
+
+  #drawSky = (trackCurvature: number) => {
+    const heightIncrement = this.#sky.height * 0.015;
+
+    const middleSky = this.#getMiddleSkyPointAsPositiveValue(trackCurvature);
+
+    let lineHeight = this.#mountain.size.min + middleSky * this.#sky.height;
+
+    let incrementDirection = 'up';
+
+    let x = 0;
+
+    this.#columns.map((_, index) => {
+      if (!this.#drawer) return;
+
+      if (incrementDirection === 'down') {
+        lineHeight += heightIncrement;
+      } else {
+        lineHeight -= heightIncrement;
+      }
+
+      if (lineHeight > this.#mountain.size.max) {
+        lineHeight = this.#mountain.size.max;
+        incrementDirection = 'up';
+      }
+
+      if (lineHeight <= this.#mountain.size.min) {
+        lineHeight = this.#mountain.size.min;
+        incrementDirection = 'down';
+      }
+
+      // * Draw
+
+      // Sky
+      this.#drawer.rectangle({
+        color: this.#sky.color,
+        x,
+        y: 0,
+        width: this.#columnsWidth,
+        height: lineHeight,
+      });
+
+      // Mountain
+      this.#drawer.rectangle({
+        color: this.#mountain.color,
+        x,
+        y: lineHeight,
+        width: this.#columnsWidth,
+        height: this.#sky.height - lineHeight,
+      });
+
+      x = index + this.#columnsWidth;
+    });
+  };
+
   render = ({ deltaTime }: IRenderObjectProps) => {
     if (!this.#car) return;
 
@@ -120,12 +180,11 @@ class Level {
     const carPositionOnTrack = this.#car.positionOnTrack;
     const carPosition = this.#car.position;
 
-    const roadColor = carPositionOnTrack === 0 ? '#FFFFFF' : this.#roadProps.color;
+    const roadColor = this.#trackSection === 0 ? '#999' : this.#roadProps.color;
 
-    // enabled rewind
-    //if (carPositionOnTrack < 0) this.#car.positionOnTrack = this.#trackLength;
+    this.#updateTrackSection(carPositionOnTrack);
 
-    this.#updateTrackSection(carSpeed, carPositionOnTrack);
+    this.#drawSky(this.#curvature);
 
     this.#lines.map((_, index) => {
       if (!this.#drawer || !this.#car || !this.#track) return;
@@ -138,7 +197,6 @@ class Level {
       perspective = 0.05 + perspective * 0.8; // limit perspective to goes from 5% to 80%
 
       // * - - -
-      // * - - -
 
       // * Elements Props
 
@@ -149,7 +207,7 @@ class Level {
       // of changing values directly. This avoids an strange effect when showing curves
       const trackCurvatureDiff = targetCurvature - this.#curvature;
 
-      this.#curvature += (trackCurvatureDiff * deltaTime * carSpeedNormalized) / 1000;
+      this.#curvature += (trackCurvatureDiff * deltaTime * carSpeedNormalized) / 1200; // ! this is making the curves a bit glitch
 
       this.#checkIfCarIsOutOfTrack(carPosition, this.#curvature);
 
@@ -157,20 +215,6 @@ class Level {
       const middlePoint = 0.5 + this.#curvature * Math.pow(1 - perspective, 3); // * correctly apply perspective to curve
       const centerX = this.#screenWidth * middlePoint;
       const variableRoadWidth = this.#roadProps.width * perspective;
-
-      // DEBUG
-      if (index === 0) {
-        this.#drawer.text({
-          color: '#FF0000',
-          x: 2,
-          y: 90,
-          fontSize: '10px',
-          //text: `String(trackCurvatureDiff)`,
-          text: `tC: ${targetCurvature.toFixed(2)} / c: ${this.#curvature.toFixed(2)} / pC: ${
-            this.#car.position
-          }`,
-        });
-      }
 
       // # Road props
       const road = {
@@ -268,15 +312,6 @@ class Level {
         width: roadLine.width,
         height: this.#lineHeight,
       });
-
-      // ! Debug
-      /*this.#drawer.rectangle({
-        color: '#FF0000',
-        x: centerX,
-        y: initialY,
-        width: 1,
-        height: this.#lineHeight,
-      });*/
     });
   };
 }

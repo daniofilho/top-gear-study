@@ -23,6 +23,14 @@ interface ITextProps extends IDefaultCoordinatesParams, IDefaultVisualParams {
   fontSize: string;
 }
 
+interface IImageProps extends IDefaultCoordinatesParams, IDefaultSizesParams {
+  image: HTMLImageElement;
+  destinationX: number;
+  destinationY: number;
+  destinationWidth: number;
+  destinationHeight: number;
+}
+
 // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 export interface ICanvasDrawerProps {
@@ -32,4 +40,5 @@ export interface ICanvasDrawerProps {
 export interface ICanvasDrawer {
   rectangle: (params: IRectangleProps) => void;
   text: (params: ITextProps) => void;
+  image: (params: IImageProps) => void;
 }

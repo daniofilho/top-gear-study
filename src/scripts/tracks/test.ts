@@ -3,7 +3,7 @@ const track: ITrack = {
   coordinates: [
     {
       curvature: 0,
-      distance: 10, // short section for start/finish
+      distance: 5, // short section for start/finish
     },
     {
       curvature: 0,
@@ -11,23 +11,19 @@ const track: ITrack = {
     },
     {
       curvature: 1,
-      distance: 25,
+      distance: 50,
     },
     {
-      curvature: 1,
+      curvature: 0,
+      distance: 100,
+    },
+    {
+      curvature: -1,
       distance: 150,
     },
     {
       curvature: 0,
-      distance: 300,
-    },
-    {
-      curvature: -1,
-      distance: 500,
-    },
-    {
-      curvature: 0,
-      distance: 750,
+      distance: 200,
     },
   ],
 };

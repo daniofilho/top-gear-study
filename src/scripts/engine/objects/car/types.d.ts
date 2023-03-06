@@ -3,3 +3,5 @@ export interface ICarRenderProps extends IRenderObjectProps {
 }
 
 export type ICarProps = IObjectProps;
+
+export type CarDirections = 'idle' | 'left' | 'right';

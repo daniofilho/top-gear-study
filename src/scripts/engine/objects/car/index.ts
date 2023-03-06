@@ -1,15 +1,14 @@
 import config from '../../../config';
 import CanvasDrawer from '../../core/CanvasDrawer';
 import { ICanvasDrawer } from '../../core/CanvasDrawer/types';
-import { ICarProps, ICarRenderProps } from './types';
+import { CarDirections, ICarProps, ICarRenderProps } from './types';
 
 class Car {
   #drawer: ICanvasDrawer | null;
 
   #width: number = config.canvas.width * 0.25;
-  #height: number = config.canvas.height * 0.1;
-  #color = '#FF0';
-  #y: number = config.canvas.height - config.canvas.height * 0.15;
+  #height: number = config.canvas.height * 0.2;
+  #y: number = config.canvas.height - config.canvas.height * 0.22;
   #sideVelocity: number = 0.5;
   #acceleration: number = 2;
 
@@ -25,8 +24,42 @@ class Car {
 
   #isOutOfTrack: boolean = false;
 
+  #spriteCarElement: HTMLImageElement | null = null;
+  #spriteDirtElement: HTMLImageElement | null = null;
+
+  #sprite = {
+    width: 63,
+    height: 34,
+    idle: {
+      x: 0,
+      y: 0,
+    },
+    left: {
+      x: 0,
+      y: 34,
+    },
+    right: {
+      x: 0,
+      y: 68,
+    },
+  };
+
+  #carDirection: CarDirections = 'idle';
+
   constructor({ context }: ICarProps) {
     this.#drawer = CanvasDrawer({ context });
+
+    const carImg = new Image();
+    carImg.src = './src/assets/images/car-white.png';
+    carImg.onload = () => {
+      this.#spriteCarElement = carImg;
+    };
+
+    const dirtImg = new Image();
+    dirtImg.src = './src/assets/images/car-dirt.png';
+    dirtImg.onload = () => {
+      this.#spriteDirtElement = dirtImg;
+    };
   }
 
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -77,8 +110,16 @@ class Car {
 
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  set carDirection(newDirection: CarDirections) {
+    this.#carDirection = newDirection;
+  }
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   turnLeft = (): void => {
     if (this.#speed <= 0) return;
+
+    this.#carDirection = 'left';
 
     let newCurvature = this.#curvature - (this.#sideVelocity * this.#speed) / 1000;
     if (newCurvature < -1) newCurvature = -1;
@@ -88,6 +129,8 @@ class Car {
 
   turnRight = (): void => {
     if (this.#speed <= 0) return;
+
+    this.#carDirection = 'right';
 
     let newCurvature = this.#curvature + (this.#sideVelocity * this.#speed) / 1000;
     if (newCurvature > 1) newCurvature = 1;
@@ -134,23 +177,46 @@ class Car {
 
   // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  #getCarSprite = () => {
+    return this.#sprite[this.#carDirection];
+  };
+
+  // * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   render = ({ deltaTime, levelCurvature }: ICarRenderProps): void => {
-    if (!this.#drawer) return;
+    if (!this.#drawer || !this.#spriteCarElement || !this.#spriteDirtElement) return;
 
     this.#position = this.#curvature - levelCurvature * 3; // increase number to increase difficulty to control the car
 
-    //if (carPosition < -1) carPosition = -1;
-    //if (carPosition > 1) carPosition = 1;
-
     let carX = this.#centerX + (this.#screenWidthWithBounds * this.#position) / 2 - this.#width / 2;
 
-    this.#drawer.rectangle({
-      color: this.#isOutOfTrack ? '#FF0000' : this.#color,
-      height: this.#height,
-      width: this.#width,
-      y: this.#y,
-      x: carX,
+    const carSprite = this.#getCarSprite();
+
+    this.#drawer.image({
+      image: this.#spriteCarElement,
+      height: this.#sprite.height,
+      width: this.#sprite.width,
+      y: carSprite.y,
+      x: carSprite.x,
+      destinationHeight: this.#height,
+      destinationWidth: this.#width,
+      destinationX: carX,
+      destinationY: this.#y,
     });
+
+    if (this.#isOutOfTrack) {
+      this.#drawer.image({
+        image: this.#spriteDirtElement,
+        height: this.#sprite.height,
+        width: this.#sprite.width,
+        y: carSprite.y,
+        x: carSprite.x,
+        destinationHeight: this.#height,
+        destinationWidth: this.#width,
+        destinationX: carX,
+        destinationY: this.#y,
+      });
+    }
 
     // Update distance traveled based on speed
     const newTraveled = (this.#speed / 30) * deltaTime;

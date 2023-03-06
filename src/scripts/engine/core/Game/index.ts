@@ -65,8 +65,15 @@ class Game {
   #handleKeyPress = (deltaTime: number): void => {
     if (!this.#car) return;
 
-    if (this.#keysDown['ArrowLeft']) this.#car.turnLeft();
-    if (this.#keysDown['ArrowRight']) this.#car.turnRight();
+    if (this.#keysDown['ArrowLeft']) {
+      this.#car.turnLeft();
+    } else {
+      if (this.#keysDown['ArrowRight']) {
+        this.#car.turnRight();
+      } else {
+        this.#car.carDirection = 'idle';
+      }
+    }
 
     if (this.#keysDown['ArrowUp']) {
       this.#car.accelerate(deltaTime);
