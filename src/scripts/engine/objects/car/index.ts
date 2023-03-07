@@ -3,6 +3,9 @@ import CanvasDrawer from '../../core/CanvasDrawer';
 import { ICanvasDrawer } from '../../core/CanvasDrawer/types';
 import { CarDirections, ICarProps, ICarRenderProps } from './types';
 
+import imageCar from '../../../../assets/images/car-white.png';
+import imageCarDirt from '../../../../assets/images/car-dirt.png';
+
 class Car {
   #drawer: ICanvasDrawer | null;
 
@@ -48,15 +51,14 @@ class Car {
 
   constructor({ context }: ICarProps) {
     this.#drawer = CanvasDrawer({ context });
-
     const carImg = new Image();
-    carImg.src = 'assets/images/car-white.png';
+    carImg.src = imageCar;
     carImg.onload = () => {
       this.#spriteCarElement = carImg;
     };
 
     const dirtImg = new Image();
-    dirtImg.src = 'assets/images/car-dirt.png';
+    dirtImg.src = imageCarDirt;
     dirtImg.onload = () => {
       this.#spriteDirtElement = dirtImg;
     };
