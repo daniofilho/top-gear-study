@@ -50,13 +50,13 @@ class Car {
     this.#drawer = CanvasDrawer({ context });
 
     const carImg = new Image();
-    carImg.src = './src/assets/images/car-white.png';
+    carImg.src = 'assets/images/car-white.png';
     carImg.onload = () => {
       this.#spriteCarElement = carImg;
     };
 
     const dirtImg = new Image();
-    dirtImg.src = './src/assets/images/car-dirt.png';
+    dirtImg.src = 'assets/images/car-dirt.png';
     dirtImg.onload = () => {
       this.#spriteDirtElement = dirtImg;
     };
