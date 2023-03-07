@@ -37,7 +37,12 @@ class Game {
     // Objects
     this.#car = new Car({ context: this.#context });
     this.#level = new Level({ context: this.#context, car: this.#car, track: defaultTrack });
-    this.#ui = new UI({ context: this.#context, car: this.#car, level: this.#level });
+    this.#ui = new UI({
+      context: this.#context,
+      car: this.#car,
+      level: this.#level,
+      canvasWidth: this.#canvas.width,
+    });
 
     this.#drawer = CanvasDrawer({ context: this.#context });
   }
@@ -111,10 +116,10 @@ class Game {
     // FPS DEBUG
     this.#drawer.text({
       color: '#FFFFFF',
-      text: `FPS: ${this.#fps}`,
-      y: 10,
+      text: `FPS: ${this.#fps.toFixed(0)}`,
+      y: 20,
       x: config.canvas.width - 50,
-      fontSize: '10px',
+      fontSize: '12px',
     });
   };
 

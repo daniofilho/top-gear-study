@@ -1,8 +1,8 @@
 const config = {
   fps: 30,
   canvas: {
-    width: 256, // SNES resolution
-    height: 220,
+    width: 400,
+    height: 300,
   },
 };
 

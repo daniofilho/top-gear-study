@@ -1,4 +1,10 @@
-# A Study about the game Top Gear
+# A Study about the games like Top Gear
+
+This is a simple study on how this kind of games were made.
+
+This project only uses Typescript, no engine.
+
+[DEMO](https://daniofilho.github.io/top-gear-study/)
 
 ## Usage
 

@@ -188,6 +188,10 @@ class Car {
 
     this.#position = this.#curvature - levelCurvature * 3; // increase number to increase difficulty to control the car
 
+    // limit the car on track bounds
+    if (this.#position < -1) this.#position = -1;
+    if (this.#position > 1) this.#position = 1;
+
     let carX = this.#centerX + (this.#screenWidthWithBounds * this.#position) / 2 - this.#width / 2;
 
     const carSprite = this.#getCarSprite();

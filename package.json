@@ -1,10 +1,10 @@
 {
   "name": "top-gear-study",
   "version": "1.0.0",
-  "description": "A study about the game Top Gear",
+  "description": "A study about the games like Top Gear",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --base=/estudo/top-gear",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "fast-push": "git add . && git commit -m '.' && git push"
   },

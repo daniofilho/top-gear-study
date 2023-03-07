@@ -15,15 +15,31 @@ const track: ITrack = {
     },
     {
       curvature: 0,
-      distance: 100,
+      distance: 200,
+    },
+    {
+      curvature: 0.4,
+      distance: 250,
+    },
+    {
+      curvature: 0.8,
+      distance: 400,
     },
     {
       curvature: -1,
-      distance: 150,
+      distance: 550,
+    },
+    {
+      curvature: -0.7,
+      distance: 700,
     },
     {
       curvature: 0,
-      distance: 200,
+      distance: 750,
+    },
+    {
+      curvature: 0.5,
+      distance: 900,
     },
   ],
 };

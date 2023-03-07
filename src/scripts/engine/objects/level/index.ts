@@ -10,20 +10,20 @@ class Level {
   #track?: ITrack;
 
   #sky = {
-    height: config.canvas.height * 0.5,
-    color: '#000044',
+    height: config.canvas.height * 0.4,
+    color: '#0000A0',
   };
 
   #mountain = {
-    color: '#9F6609',
+    color: '#020080',
     size: {
-      min: this.#sky.height * 0.1,
+      min: this.#sky.height * 0.3,
       max: this.#sky.height * 0.9,
     },
   };
 
-  #lines = new Array(config.canvas.height / 2).fill('');
-  #lineHeight = (config.canvas.height - this.#sky.height) / this.#lines.length;
+  #lines = new Array(config.canvas.height / 1.5).fill('');
+  #lineHeight = Math.round((config.canvas.height - this.#sky.height) / this.#lines.length);
 
   #columns = new Array(config.canvas.width).fill('');
   #columnsWidth = config.canvas.width / this.#columns.length;
@@ -34,12 +34,12 @@ class Level {
   };
 
   #grassProps = {
-    colors: ['#20aa20', '#20BB20'],
+    colors: ['#058900', '#076C02'],
     frequency: 60,
   };
 
   #roadLineProps = {
-    colors: ['#AA0000', '#FFFFFF'],
+    colors: ['#940000', '#CECECE'],
     width: this.#roadProps.width * 0.1,
     frequency: 60,
   };
@@ -119,7 +119,7 @@ class Level {
   };
 
   #drawSky = (trackCurvature: number) => {
-    const heightIncrement = this.#sky.height * 0.015;
+    const heightIncrement = this.#sky.height * 0.003;
 
     const middleSky = this.#getMiddleSkyPointAsPositiveValue(trackCurvature);
 
@@ -194,7 +194,7 @@ class Level {
       // * This is the key code to define the width of each line and make the perspective effect of road
 
       let perspective = index / (config.canvas.height / 2);
-      perspective = 0.05 + perspective * 0.8; // limit perspective to goes from 5% to 80%
+      perspective = 0.04 + perspective * 0.8; // limit perspective to goes from 5% to 80%
 
       // * - - -
 
